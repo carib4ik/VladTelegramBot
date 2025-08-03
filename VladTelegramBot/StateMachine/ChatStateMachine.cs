@@ -15,7 +15,7 @@ public class ChatStateMachine
     {
         _states[typeof(IdleState)] = () => new IdleState(this);
         _states[typeof(StartState)] = () => new StartState(this, botClient, usersDataProvider);
-        _states[typeof(AnsweringState)] = () => new AnsweringState(this, botClient, usersDataProvider, dbContext);
+        _states[typeof(SurveyState)] = () => new SurveyState(this, botClient, usersDataProvider, dbContext);
     }
     
     public ChatStateBase GetState(long chatId)

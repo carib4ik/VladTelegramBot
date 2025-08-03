@@ -43,7 +43,7 @@ public class ChatStateController(ChatStateMachine chatStateMachine)
                 break;
             
             case GlobalData.Answer:
-                await chatStateMachine.TransitTo<AnsweringState>(chatId);
+                await chatStateMachine.TransitTo<SurveyState>(chatId);
                 break;
             
             default:

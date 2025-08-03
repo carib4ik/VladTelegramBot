@@ -2,9 +2,9 @@ namespace VladTelegramBot.Data;
 
 public class UserData
 {
-    public required long TelegramId { get;  set; }
-    public required string TelegramName { get;  set; }
-    public required long ChatId { get;  set; }
+    public long TelegramId { get;  set; }
+    public string? TelegramName { get;  set; }
+    public long ChatId { get;  set; }
     public bool IsPassedTheTest { get;  set; }
     public int SurveyStep { get; set; } = 1;
     public string? Answer1 { get; set; }

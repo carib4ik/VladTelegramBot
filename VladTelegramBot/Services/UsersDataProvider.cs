@@ -8,12 +8,14 @@ namespace VladTelegramBot.Services;
 public class UsersDataProvider(AppDbContext dbContext)
 {
     private readonly ConcurrentDictionary<long, UserData> _usersData = new();
+    private readonly ConcurrentQueue<long> _cash = new();
     
     public async Task<UserData> GetOrCreateUserDataAsync(long chatId, long telegramId = 0, string? telegramName = null)
     {
+        TryToClearCash();
+        
         if (_usersData.TryGetValue(chatId, out var userData))
         {
-            Console.WriteLine($"User is found in the InMemory. TelegramName {userData.TelegramName}, TelegramId {userData.TelegramId}, passed the test {userData.IsPassedTheTest}");
             return userData;
         }
 
@@ -23,8 +25,6 @@ public class UsersDataProvider(AppDbContext dbContext)
 
         if (survey is not null)
         {
-            Console.WriteLine($"User is found in the DB. TelegramName {survey.TelegramName}, TelegramId {survey.TelegramId}, passed the test {survey.IsPassedTheTest}");
-            
             var user =  new UserData
             {
                 ChatId = chatId,
@@ -33,7 +33,8 @@ public class UsersDataProvider(AppDbContext dbContext)
                 IsPassedTheTest = true
             };
             
-            _usersData.TryAdd(chatId, user);
+            AddUserToMemory(chatId, user);
+            
             return user;
         }
 
@@ -44,10 +45,25 @@ public class UsersDataProvider(AppDbContext dbContext)
             TelegramId = telegramId
         };
         
+        await SaveUserToDatabase(userData);
+        
+        AddUserToMemory(chatId, userData);
+        
+        return userData;
+    }
+
+    private void AddUserToMemory(long chatId, UserData user)
+    {
+        _usersData.TryAdd(chatId, user);
+        _cash.Enqueue(chatId);
+    }
+
+    private async Task SaveUserToDatabase(UserData userData)
+    {
         var result = new SurveyResult
         {
             Id = Guid.NewGuid(),
-            ChatId = chatId,
+            ChatId = userData.ChatId,
             TelegramName = userData.TelegramName,
             TelegramId = userData.TelegramId,
             SubmittedAt = DateTime.UtcNow
@@ -55,25 +71,17 @@ public class UsersDataProvider(AppDbContext dbContext)
 
         dbContext.SurveyResults.Add(result);
         await dbContext.SaveChangesAsync();
-        
-        Console.WriteLine($"User has been saved. TelegramName {userData.TelegramName}, TelegramId {userData.TelegramId}, passed the test {userData.IsPassedTheTest}");
-        
-        _usersData.TryAdd(chatId, userData);
-        
-        return userData;
     }
-
-    public void RemoveUserFromInMemory(long chatId)
-    {
-        _usersData.TryRemove(chatId, out _);
-    }
-
-    public bool HasUserPassedSurvey(long chatId)
-    {
-        return _usersData.TryGetValue(chatId, out var data) && data.IsPassedTheTest;
-    }
-
-    public IEnumerable<UserData> GetAll() => _usersData.Values;
     
-    
+    private void TryToClearCash()
+    {
+        if (_cash.Count >= 100)
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                _cash.TryDequeue(out var oldChatId);
+                _usersData.TryRemove(oldChatId, out _);
+            }
+        }
+    }
 }

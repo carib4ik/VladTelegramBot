@@ -6,7 +6,7 @@ using VladTelegramBot.Services;
 
 namespace VladTelegramBot.StateMachine.States;
 
-public class AnsweringState(
+public class SurveyState(
     ChatStateMachine stateMachine,
     ITelegramBotClient botClient,
     UsersDataProvider usersDataProvider,
@@ -53,12 +53,18 @@ public class AnsweringState(
 
     public override async Task OnEnter(long chatId)
     {
-        Console.WriteLine("Answering state");
+        Console.WriteLine("Survey state");
 
         await botClient.SendMessage(chatId, GlobalData.Question1);
     }
 
     public override async Task OnExit(long chatId)
+    {
+        await TryToSaveUserAnswersToDb(chatId);
+        await base.OnExit(chatId);
+    }
+
+    private async Task TryToSaveUserAnswersToDb(long chatId)
     {
         var userData = await usersDataProvider.GetOrCreateUserDataAsync(chatId);
 
@@ -77,13 +83,13 @@ public class AnsweringState(
                 existingResult.IsPassedTheTest = userData.IsPassedTheTest;
 
                 await dbContext.SaveChangesAsync();
+
+                Console.WriteLine("Ответы сохранены в базе");
             }
             else
             {
                 Console.WriteLine("Ошибка обновления данных после опроса");
             }
         }
-        
-        await base.OnExit(chatId);
     }
 }
