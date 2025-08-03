@@ -1,7 +1,8 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using VladTelegramBot.AppConfigs;
 using VladTelegramBot.Data;
@@ -14,12 +15,21 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        var config = LoadConfig();
-        
         var host = Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((context, configBuilder) =>
+        {
+            configBuilder
+                .AddJsonFile("AppConfigs/appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+        })
             .ConfigureServices((context, services) =>
             {
-                services.AddSingleton(config);
+                // Автоматическое биндинг AppConfig из IConfiguration
+                services.Configure<AppConfig>(context.Configuration);
+                services.AddSingleton(sp => sp.GetRequiredService<IOptions<AppConfig>>().Value);
+
+                var config = context.Configuration.Get<AppConfig>();
+                
                 services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(config.TelegramBotToken));
                 
                 services.AddScoped<UsersDataProvider>();
@@ -37,11 +47,5 @@ public static class Program
         bot.StartBot();
 
         await host.RunAsync();
-    }
-    
-    private static AppConfig LoadConfig()
-    {
-        var json = File.ReadAllText("AppConfigs/appsettings.json");
-        return JsonSerializer.Deserialize<AppConfig>(json)!;
     }
 }
