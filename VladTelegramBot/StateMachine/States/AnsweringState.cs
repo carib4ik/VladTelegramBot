@@ -1,21 +1,25 @@
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using VladTelegramBot.Data;
-using VladTelegramBot.Data.Entities;
 using VladTelegramBot.Services;
 
 namespace VladTelegramBot.StateMachine.States;
 
-public class AnsweringState(ChatStateMachine stateMachine, ITelegramBotClient botClient, UsersDataProvider usersDataProvider, AppDbContext dbContext)
+public class AnsweringState(
+    ChatStateMachine stateMachine,
+    ITelegramBotClient botClient,
+    UsersDataProvider usersDataProvider,
+    AppDbContext dbContext)
     : ChatStateBase(stateMachine)
 {
     public override async Task HandleMessage(Message message)
     {
         var chatId = message.Chat.Id;
         var userAnswer = message.Text;
-        
+
         var userData = await usersDataProvider.GetOrCreateUserDataAsync(chatId);
-        
+
         switch (userData.SurveyStep)
         {
             case 1:
@@ -50,7 +54,7 @@ public class AnsweringState(ChatStateMachine stateMachine, ITelegramBotClient bo
     public override async Task OnEnter(long chatId)
     {
         Console.WriteLine("Answering state");
-        
+
         await botClient.SendMessage(chatId, GlobalData.Question1);
     }
 
@@ -60,18 +64,24 @@ public class AnsweringState(ChatStateMachine stateMachine, ITelegramBotClient bo
 
         if (userData.IsPassedTheTest)
         {
-            var result = new SurveyResult
-            {
-                Answer1 = userData.Answer1,
-                Answer2 = userData.Answer2,
-                Answer3 = userData.Answer3,
-                Answer4 = userData.Answer4,
-                Answer5 = userData.Answer5,
-                IsPassedTheTest = userData.IsPassedTheTest,
-            };
+            var existingResult = await dbContext.SurveyResults
+                .FirstOrDefaultAsync(x => x.ChatId == chatId);
 
-            dbContext.SurveyResults.Add(result);
-            await dbContext.SaveChangesAsync();
+            if (existingResult != null)
+            {
+                existingResult.Answer1 = userData.Answer1;
+                existingResult.Answer2 = userData.Answer2;
+                existingResult.Answer3 = userData.Answer3;
+                existingResult.Answer4 = userData.Answer4;
+                existingResult.Answer5 = userData.Answer5;
+                existingResult.IsPassedTheTest = userData.IsPassedTheTest;
+
+                await dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                Console.WriteLine("Ошибка обновления данных после опроса");
+            }
         }
         
         await base.OnExit(chatId);

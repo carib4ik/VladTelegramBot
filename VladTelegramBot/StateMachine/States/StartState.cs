@@ -21,7 +21,7 @@ public class StartState(ChatStateMachine stateMachine, ITelegramBotClient botCli
 
     private async Task SendGreeting(long chatId)
     {
-        if (CheckUserPassedTheTest(chatId))
+        if (HasUserPassedTheTest(chatId))
         {
             var joinButton = InlineKeyboardButton.WithCallbackData("Вступить в закрытый канал", GlobalData.Join);
 
@@ -43,7 +43,7 @@ public class StartState(ChatStateMachine stateMachine, ITelegramBotClient botCli
         }
     }
 
-    private bool CheckUserPassedTheTest(long chatId)
+    private bool HasUserPassedTheTest(long chatId)
     {
         return usersDataProvider.GetOrCreateUserDataAsync(chatId).Result.IsPassedTheTest;
     }
