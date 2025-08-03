@@ -28,7 +28,6 @@ public class UsersDataProvider(AppDbContext dbContext)
             var user =  new UserData
             {
                 ChatId = chatId,
-                TelegramId = survey.TelegramId,
                 TelegramName = survey.TelegramName,
                 IsPassedTheTest = true
             };
@@ -41,8 +40,7 @@ public class UsersDataProvider(AppDbContext dbContext)
         userData = new UserData
         {
             ChatId = chatId,
-            TelegramName = telegramName,
-            TelegramId = telegramId
+            TelegramName = telegramName
         };
         
         await SaveUserToDatabase(userData);
@@ -65,7 +63,6 @@ public class UsersDataProvider(AppDbContext dbContext)
             Id = Guid.NewGuid(),
             ChatId = userData.ChatId,
             TelegramName = userData.TelegramName,
-            TelegramId = userData.TelegramId,
             SubmittedAt = DateTime.UtcNow
         };
 

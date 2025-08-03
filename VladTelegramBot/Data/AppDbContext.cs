@@ -10,7 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserDataEntity>()
-            .HasIndex(x => x.TelegramId)
+            .HasIndex(x => x.ChatId)
             .IsUnique();
     }
 }

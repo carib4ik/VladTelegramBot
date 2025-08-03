@@ -8,7 +8,8 @@ namespace VladTelegramBot.StateMachine.States;
 public class UserDataSubmissionState(
     ChatStateMachine stateMachine,
     UsersDataProvider usersDataProvider,
-    AppDbContext dbContext) : ChatStateBase(stateMachine)
+    AppDbContext dbContext) 
+    : ChatStateBase(stateMachine)
 {
     public override Task HandleMessage(Message message)
     {
@@ -20,7 +21,7 @@ public class UserDataSubmissionState(
         await TryToSaveUserAnswersToDb(chatId);
         await StateMachine.TransitTo<IdleState>(chatId);
     }
-    
+
     private async Task TryToSaveUserAnswersToDb(long chatId)
     {
         var userData = await usersDataProvider.GetOrCreateUserDataAsync(chatId);

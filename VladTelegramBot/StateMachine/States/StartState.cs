@@ -1,12 +1,17 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using VladTelegramBot.AppConfigs;
 using VladTelegramBot.Data;
 using VladTelegramBot.Services;
 
 namespace VladTelegramBot.StateMachine.States;
 
-public class StartState(ChatStateMachine stateMachine, ITelegramBotClient botClient, UsersDataProvider usersDataProvider)
+public class StartState(
+    ChatStateMachine stateMachine,
+    ITelegramBotClient botClient,
+    UsersDataProvider usersDataProvider,
+    AppConfig appConfig)
     : ChatStateBase(stateMachine)
 {
     public override Task HandleMessage(Message message)
@@ -22,24 +27,24 @@ public class StartState(ChatStateMachine stateMachine, ITelegramBotClient botCli
 
     private async Task SendGreeting(long chatId)
     {
+        if (IsUserAdmin(chatId))
+        {
+            await StateMachine.TransitTo<AdminState>(chatId);
+            return;
+        }
+        
         if (HasUserPassedTheTest(chatId))
         {
-            var joinButton = InlineKeyboardButton.WithCallbackData("Вступить в закрытый канал", GlobalData.Join);
-
-            var keyboard = new InlineKeyboardMarkup([[joinButton]]);
-
-            await botClient.SendMessage(chatId, GlobalData.GreetingsAfterTest, replyMarkup: keyboard);
-        
-            await StateMachine.TransitTo<IdleState>(chatId);
+            await StateMachine.TransitTo<InviteState>(chatId);
         }
         else
         {
-            var answerButton = InlineKeyboardButton.WithCallbackData("Start answering", GlobalData.Answer);
+            var answerButton = InlineKeyboardButton.WithCallbackData("Пройти опрос", GlobalData.Answer);
 
             var keyboard = new InlineKeyboardMarkup([[answerButton]]);
 
             await botClient.SendMessage(chatId, GlobalData.GreetingsBeforeTest, replyMarkup: keyboard);
-        
+
             await StateMachine.TransitTo<IdleState>(chatId);
         }
     }
@@ -47,5 +52,10 @@ public class StartState(ChatStateMachine stateMachine, ITelegramBotClient botCli
     private bool HasUserPassedTheTest(long chatId)
     {
         return usersDataProvider.GetOrCreateUserDataAsync(chatId).Result.IsPassedTheTest;
+    }
+    
+    private bool IsUserAdmin(long chatId)
+    {
+        return appConfig.AdminTelegramIds.Any(adminId => adminId == chatId);
     }
 }

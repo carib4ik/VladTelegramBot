@@ -2,9 +2,8 @@ namespace VladTelegramBot.Data.Entities;
 
 public class UserData
 {
-    public long TelegramId { get;  set; }
-    public string? TelegramName { get;  set; }
     public long ChatId { get;  set; }
+    public string? TelegramName { get;  set; }
     public bool IsPassedTheTest { get;  set; }
     public int SurveyStep { get; set; } = 1;
     public string? Answer1 { get; set; }

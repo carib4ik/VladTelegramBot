@@ -5,6 +5,7 @@ public static class GlobalData
     public const string Start = "/start";
     public const string Answer = "AnswerQuestions";
     public const string Join = "JoinGroup";
+    public const string Exel = "RequestExelFile";
     
     public const string GreetingsAfterTest = "Cообщение если пользователь уже прошел опрос";
     public const string GreetingsBeforeTest = "Приветсвенное сообщение если пользователь ещё не прошел опрос";
