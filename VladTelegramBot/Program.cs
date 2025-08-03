@@ -1,6 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
+using VladTelegramBot.AppConfigs;
+using VladTelegramBot.Data;
 using VladTelegramBot.Services;
 using VladTelegramBot.StateMachine;
 
@@ -17,10 +21,14 @@ public static class Program
             {
                 services.AddSingleton(config);
                 services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(config.TelegramBotToken));
-                services.AddSingleton<UsersDataProvider>();
-                services.AddSingleton<ChatStateMachine>();
-                services.AddSingleton<ChatStateController>();
-                services.AddSingleton<TelegramBotController>();
+                
+                services.AddScoped<UsersDataProvider>();
+                services.AddScoped<ChatStateMachine>();
+                services.AddScoped<ChatStateController>();
+                services.AddScoped<TelegramBotController>();
+
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseNpgsql(config.ConnectionString));
             })
             .Build();
         
@@ -30,11 +38,9 @@ public static class Program
         await host.RunAsync();
     }
     
-    private static AppConfig.AppConfig LoadConfig()
+    private static AppConfig LoadConfig()
     {
-        return new AppConfig.AppConfig
-        {
-            TelegramBotToken = "8051065649:AAGS1okoQfC4y3ZEMPwdqkRILIJn00G-6mk",
-        };
+        var json = File.ReadAllText("AppConfigs/appsettings.json");
+        return JsonSerializer.Deserialize<AppConfig>(json)!;
     }
 }

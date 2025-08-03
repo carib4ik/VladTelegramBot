@@ -45,6 +45,6 @@ public class StartState(ChatStateMachine stateMachine, ITelegramBotClient botCli
 
     private bool CheckUserPassedTheTest(long chatId)
     {
-        return usersDataProvider.GetUserData(chatId).IsPassedTheTest;
+        return usersDataProvider.GetOrCreateUserDataAsync(chatId).Result.IsPassedTheTest;
     }
 }

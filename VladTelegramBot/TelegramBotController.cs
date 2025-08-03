@@ -76,16 +76,17 @@ public class TelegramBotController(
             return;
         }
         
-        var userId = message != null ? message.From.Id : callbackQuery.From.Id;
+        var telegramId = message != null ? message.From.Id : callbackQuery.From.Id;
         var messageId = message != null ? message.MessageId : callbackQuery.Message.MessageId;
         var messageText = message != null ? message.Text : callbackQuery?.Data;
         var chatId = message != null ? message.Chat.Id : callbackQuery.Message.Chat.Id;
+        var telegramName = message != null ? message.From.Username : callbackQuery.From.Username;
         
+        await usersDataProvider.GetOrCreateUserDataAsync(chatId, telegramId, telegramName);
 
         if (messageText == GlobalData.Start || messageText == GlobalData.Answer)
         {
-            await DeleteMessageAsync(userId, messageId, cancellationToken);
-            usersDataProvider.SetTelegramName(chatId, message?.From?.Username);
+            await DeleteMessageAsync(telegramId, messageId, cancellationToken);
         }
         
         await chatStateController.HandleUpdateAsync(update);

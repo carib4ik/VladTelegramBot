@@ -1,21 +1,54 @@
 using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
 using VladTelegramBot.Data;
 
 namespace VladTelegramBot.Services;
 
-public class UsersDataProvider
+public class UsersDataProvider(AppDbContext dbContext)
 {
     private readonly ConcurrentDictionary<long, UserData> _usersData = new();
     
-    public void SetTelegramName(long chatId, string? telegramName)
+    public async Task<UserData> GetOrCreateUserDataAsync(long chatId, long telegramId = 0, string? telegramName = null)
     {
-        var userData = _usersData.GetOrAdd(chatId, new UserData());
-        userData.TelegramName = telegramName;
-        userData.ChatId =  chatId;
+        if (_usersData.TryGetValue(chatId, out var userData))
+            return userData;
+
+        var survey = await dbContext.SurveyResults
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.ChatId == chatId);
+
+        if (survey is not null)
+        {
+            // если пользователь уже прошёл опрос — не возвращаем новый UserData
+            return new UserData
+            {
+                ChatId = chatId,
+                TelegramId = survey.TelegramId,
+                TelegramName = survey.TelegramName,
+                IsPassedTheTest = true
+            };
+        }
+
+        userData = new UserData
+        {
+            ChatId = chatId,
+            TelegramName = telegramName,
+            TelegramId = telegramId
+        };
+
+        _usersData.TryAdd(chatId, userData);
+        return userData;
     }
-    
-    public UserData GetUserData(long chatId)
+
+    public void RemoveUserFromInMemory(long chatId)
     {
-        return _usersData[chatId];
+        _usersData.TryRemove(chatId, out _);
     }
+
+    public bool HasUserPassedSurvey(long chatId)
+    {
+        return _usersData.TryGetValue(chatId, out var data) && data.IsPassedTheTest;
+    }
+
+    public IEnumerable<UserData> GetAll() => _usersData.Values;
 }
