@@ -23,6 +23,7 @@ public static class Program
                 services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(config.TelegramBotToken));
                 
                 services.AddScoped<UsersDataProvider>();
+                services.AddScoped<ExcelExportService>();
                 services.AddScoped<ChatStateMachine>();
                 services.AddScoped<ChatStateController>();
                 services.AddScoped<TelegramBotController>();

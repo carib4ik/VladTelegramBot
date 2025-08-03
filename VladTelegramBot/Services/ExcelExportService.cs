@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using VladTelegramBot.Data;
+using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace VladTelegramBot.Services;
 
@@ -9,7 +10,7 @@ public class ExcelExportService(AppDbContext dbContext)
 {
     public async Task<byte[]> ExportSurveyResultsToExcelAsync()
     {
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // для EPPlus
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
         var results = await dbContext.SurveyResults.ToListAsync();
 

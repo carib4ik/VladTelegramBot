@@ -13,7 +13,7 @@ public class ChatStateMachine
     private readonly Dictionary<Type, Func<ChatStateBase>> _states = new();
 
     public ChatStateMachine(ITelegramBotClient botClient, UsersDataProvider usersDataProvider, AppDbContext dbContext,
-        AppConfig appConfig)
+        AppConfig appConfig, ExcelExportService excelExportService)
     {
         _states[typeof(IdleState)] = () => new IdleState(this);
         _states[typeof(StartState)] = () => new StartState(this, botClient, usersDataProvider, appConfig);
@@ -21,6 +21,7 @@ public class ChatStateMachine
         _states[typeof(UserDataSubmissionState)] = () => new UserDataSubmissionState(this, usersDataProvider, dbContext);
         _states[typeof(InviteState)] = () => new InviteState(this, botClient);
         _states[typeof(AdminState)] = () => new AdminState(this, botClient);
+        _states[typeof(SendExelState)] = () => new SendExelState(this, botClient, excelExportService);
     }
 
     public ChatStateBase GetState(long chatId)

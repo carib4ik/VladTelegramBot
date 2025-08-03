@@ -18,8 +18,10 @@ public class UserDataSubmissionState(
 
     public override async Task OnEnter(long chatId)
     {
+        Console.WriteLine("user data submission state");
+        
         await TryToSaveUserAnswersToDb(chatId);
-        await StateMachine.TransitTo<IdleState>(chatId);
+        await StateMachine.TransitTo<InviteState>(chatId);
     }
 
     private async Task TryToSaveUserAnswersToDb(long chatId)

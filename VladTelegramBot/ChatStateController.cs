@@ -46,6 +46,10 @@ public class ChatStateController(ChatStateMachine chatStateMachine)
                 await chatStateMachine.TransitTo<SurveyState>(chatId);
                 break;
             
+            case GlobalData.Excel:
+                await chatStateMachine.TransitTo<SendExelState>(chatId);
+                break;
+            
             default:
                 var state = chatStateMachine.GetState(chatId);
                 await state.HandleMessage(message);

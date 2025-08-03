@@ -14,7 +14,7 @@ public class AdminState(ChatStateMachine stateMachine, ITelegramBotClient botCli
 
     public override async Task OnEnter(long chatId)
     {
-        var exelButton = InlineKeyboardButton.WithCallbackData("Скачать Exel File", GlobalData.Exel);
+        var exelButton = InlineKeyboardButton.WithCallbackData("Скачать Exel File", GlobalData.Excel);
 
         var keyboard = new InlineKeyboardMarkup([[exelButton]]);
 
