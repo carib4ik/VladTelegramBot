@@ -16,6 +16,7 @@ public class StartState(ChatStateMachine stateMachine, ITelegramBotClient botCli
 
     public override async Task OnEnter(long chatId)
     {
+        Console.WriteLine("Start state");
         await SendGreeting(chatId);
     }
 

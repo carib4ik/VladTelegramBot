@@ -1,4 +1,4 @@
-namespace VladTelegramBot.Data;
+namespace VladTelegramBot.Data.Entities;
 
 public class UserData
 {

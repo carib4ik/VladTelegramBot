@@ -1,6 +1,6 @@
 namespace VladTelegramBot.Data.Entities;
 
-public class SurveyResult
+public class UserDataEntity
 {
     public Guid Id { get; set; }
     public long TelegramId { get; set; }

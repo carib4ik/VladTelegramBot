@@ -60,7 +60,7 @@ public class UsersDataProvider(AppDbContext dbContext)
 
     private async Task SaveUserToDatabase(UserData userData)
     {
-        var result = new SurveyResult
+        var result = new UserDataEntity
         {
             Id = Guid.NewGuid(),
             ChatId = userData.ChatId,

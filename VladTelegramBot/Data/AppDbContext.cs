@@ -5,11 +5,11 @@ namespace VladTelegramBot.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<SurveyResult> SurveyResults { get; set; }
+    public DbSet<UserDataEntity> SurveyResults { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<SurveyResult>()
+        modelBuilder.Entity<UserDataEntity>()
             .HasIndex(x => x.TelegramId)
             .IsUnique();
     }
