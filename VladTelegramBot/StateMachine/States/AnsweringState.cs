@@ -62,17 +62,12 @@ public class AnsweringState(ChatStateMachine stateMachine, ITelegramBotClient bo
         {
             var result = new SurveyResult
             {
-                Id = Guid.NewGuid(),
-                ChatId = chatId,
-                TelegramName = userData.TelegramName,
-                TelegramId = userData.TelegramId,
                 Answer1 = userData.Answer1,
                 Answer2 = userData.Answer2,
                 Answer3 = userData.Answer3,
                 Answer4 = userData.Answer4,
                 Answer5 = userData.Answer5,
                 IsPassedTheTest = userData.IsPassedTheTest,
-                SubmittedAt = DateTime.UtcNow
             };
 
             dbContext.SurveyResults.Add(result);
