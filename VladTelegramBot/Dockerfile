@@ -11,7 +11,7 @@ WORKDIR /app/VladTelegramBot
 RUN dotnet publish -c Release -o out
 
 # Финальный образ
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/VladTelegramBot/out ./
 ENTRYPOINT ["dotnet", "VladTelegramBot.dll"]
