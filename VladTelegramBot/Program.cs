@@ -24,10 +24,16 @@ public static class Program
             })
             .ConfigureServices((context, services) =>
             {
-                services.Configure<AppConfig>(context.Configuration);
-                services.AddSingleton(sp => sp.GetRequiredService<IOptions<AppConfig>>().Value);
+                var configuration = context.Configuration;
 
-                var config = context.Configuration.Get<AppConfig>();
+                var config = new AppConfig
+                {
+                    TelegramBotToken = configuration["TelegramBotToken"] ?? throw new InvalidOperationException("Missing bot token"),
+                    ConnectionString = configuration["ConnectionString"] ?? throw new InvalidOperationException("Missing connection string"),
+                    AdminTelegramIds = ParseAdminIds(configuration["AdminTelegramIds"])
+                };
+                
+                services.AddSingleton(config);
 
                 services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(config.TelegramBotToken));
 
@@ -46,5 +52,14 @@ public static class Program
         bot.StartBot();
 
         await host.RunAsync();
+    }
+    
+    private static List<long> ParseAdminIds(string? ids)
+    {
+        return ids?
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => long.TryParse(id.Trim(), out var parsed) ? parsed : 0)
+            .Where(id => id > 0)
+            .ToList() ?? new List<long>();
     }
 }
