@@ -11,14 +11,14 @@ public class InviteState(
     ITelegramBotClient  botClient) 
     : ChatStateBase(stateMachine)
 {
-    public override Task HandleMessage(Message message)
+    public override Task HandleMessage(Message message, CallbackQuery? callbackQuery = null)
     {
         return Task.CompletedTask;
     }
 
     public override async Task OnEnter(long chatId)
     {
-        var joinButton = InlineKeyboardButton.WithCallbackData("Вступить в закрытый канал", GlobalData.Join);
+        var joinButton = InlineKeyboardButton.WithUrl("Вступить в закрытый канал", GlobalData.Join);
 
         var keyboard = new InlineKeyboardMarkup([[joinButton]]);
 

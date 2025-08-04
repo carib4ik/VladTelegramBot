@@ -9,7 +9,7 @@ using VladTelegramBot.Services;
 namespace VladTelegramBot;
 
 public class TelegramBotController(
-    ITelegramBotClient telegramBotClient,
+    ITelegramBotClient botClient,
     ChatStateController chatStateController,
     UsersDataProvider usersDataProvider)
 {
@@ -24,28 +24,28 @@ public class TelegramBotController(
 
         CreateCommandsKeyboard().WaitAsync(cts.Token);
         
-        telegramBotClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cancellationToken: cts.Token);
+        botClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cancellationToken: cts.Token);
 
         Console.WriteLine("Bot started");
     }
 
     private async Task CreateCommandsKeyboard()
     {
-        await telegramBotClient.DeleteMyCommands();
+        await botClient.DeleteMyCommands();
 
         var commands = new[]
         {
             new BotCommand { Command = GlobalData.Start, Description = "Запустить бота" }
         };
         
-        await telegramBotClient.SetMyCommands(
+        await botClient.SetMyCommands(
             commands,
             scope: new BotCommandScopeDefault(),
             languageCode: "ru"
         );
     }
     
-    private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+    private Task HandleErrorAsync(ITelegramBotClient telegramBotClient, Exception exception,
         CancellationToken cancellationToken)
     {
         var requestException = exception switch
@@ -76,17 +76,17 @@ public class TelegramBotController(
             return;
         }
         
-        var telegramId = message != null ? message.From.Id : callbackQuery.From.Id;
         var messageId = message != null ? message.MessageId : callbackQuery.Message.MessageId;
         var messageText = message != null ? message.Text : callbackQuery?.Data;
         var chatId = message != null ? message.Chat.Id : callbackQuery.Message.Chat.Id;
         var telegramName = message != null ? message.From.Username : callbackQuery.From.Username;
-        
-        await usersDataProvider.GetOrCreateUserDataAsync(chatId, telegramId, telegramName);
+
+        await botClient.SendChatAction(chatId, ChatAction.Typing, cancellationToken: cancellationToken);
+        await usersDataProvider.GetOrCreateUserDataAsync(chatId, telegramName);
 
         if (messageText == GlobalData.Start || messageText == GlobalData.Answer)
         {
-            await DeleteMessageAsync(telegramId, messageId, cancellationToken);
+            await DeleteMessageAsync(chatId, messageId, cancellationToken);
         }
         
         await chatStateController.HandleUpdateAsync(update);
@@ -97,7 +97,7 @@ public class TelegramBotController(
     {
         try
         {
-            await telegramBotClient.DeleteMessage(chatId, messageId, cancellationToken: cancellationToken);
+            await botClient.DeleteMessage(chatId, messageId, cancellationToken: cancellationToken);
         }
         catch (ApiRequestException exception)
         {

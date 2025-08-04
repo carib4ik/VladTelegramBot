@@ -7,7 +7,7 @@ namespace VladTelegramBot.StateMachine.States;
 public class SendExelState(ChatStateMachine stateMachine, ITelegramBotClient botClient, ExcelExportService excelExportService)
     : ChatStateBase(stateMachine)
 {
-    public override Task HandleMessage(Message message)
+    public override Task HandleMessage(Message message, CallbackQuery? callbackQuery = null)
     {
         return Task.CompletedTask;
     }

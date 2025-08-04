@@ -17,21 +17,20 @@ public static class Program
     {
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((context, configBuilder) =>
-        {
-            configBuilder
-                .AddJsonFile("AppConfigs/appsettings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
-        })
+            {
+                configBuilder
+                    .AddJsonFile("AppConfigs/appsettings.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables();
+            })
             .ConfigureServices((context, services) =>
             {
-                // Автоматическое биндинг AppConfig из IConfiguration
                 services.Configure<AppConfig>(context.Configuration);
                 services.AddSingleton(sp => sp.GetRequiredService<IOptions<AppConfig>>().Value);
 
                 var config = context.Configuration.Get<AppConfig>();
-                
+
                 services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(config.TelegramBotToken));
-                
+
                 services.AddScoped<UsersDataProvider>();
                 services.AddScoped<ExcelExportService>();
                 services.AddScoped<ChatStateMachine>();
@@ -42,7 +41,7 @@ public static class Program
                     options.UseNpgsql(config.ConnectionString));
             })
             .Build();
-        
+
         var bot = host.Services.GetRequiredService<TelegramBotController>();
         bot.StartBot();
 

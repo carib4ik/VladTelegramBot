@@ -11,7 +11,7 @@ public class UserDataSubmissionState(
     AppDbContext dbContext) 
     : ChatStateBase(stateMachine)
 {
-    public override Task HandleMessage(Message message)
+    public override Task HandleMessage(Message message, CallbackQuery? callbackQuery = null)
     {
         return Task.CompletedTask;
     }

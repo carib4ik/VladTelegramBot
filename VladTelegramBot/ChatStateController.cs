@@ -17,6 +17,7 @@ public class ChatStateController(ChatStateMachine chatStateMachine)
 
         string? data;
         Message message;
+        CallbackQuery? callbackQuery = null;
         
         switch (update.Type)
         {
@@ -28,6 +29,7 @@ public class ChatStateController(ChatStateMachine chatStateMachine)
             case UpdateType.CallbackQuery:
                 data = update.CallbackQuery.Data;
                 message = update.CallbackQuery.Message;
+                callbackQuery = update.CallbackQuery;
                 break;
             
             default:
@@ -52,7 +54,7 @@ public class ChatStateController(ChatStateMachine chatStateMachine)
             
             default:
                 var state = chatStateMachine.GetState(chatId);
-                await state.HandleMessage(message);
+                await state.HandleMessage(message, callbackQuery);
                 break;
         }
     }

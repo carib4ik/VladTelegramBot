@@ -10,7 +10,7 @@ public class IdleState(ChatStateMachine stateMachine) : ChatStateBase(stateMachi
         return Task.CompletedTask;
     }
 
-    public override Task HandleMessage(Message message)
+    public override Task HandleMessage(Message message, CallbackQuery? callbackQuery = null)
     {
         return Task.CompletedTask;
     }

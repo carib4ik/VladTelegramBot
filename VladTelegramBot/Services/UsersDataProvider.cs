@@ -10,7 +10,7 @@ public class UsersDataProvider(AppDbContext dbContext)
     private readonly ConcurrentDictionary<long, UserData> _usersData = new();
     private readonly ConcurrentQueue<long> _cash = new();
     
-    public async Task<UserData> GetOrCreateUserDataAsync(long chatId, long telegramId = 0, string? telegramName = null)
+    public async Task<UserData> GetOrCreateUserDataAsync(long chatId, string? telegramName = null)
     {
         TryToClearCash();
         
@@ -29,11 +29,10 @@ public class UsersDataProvider(AppDbContext dbContext)
             {
                 ChatId = chatId,
                 TelegramName = survey.TelegramName,
-                IsPassedTheTest = true
+                IsPassedTheTest = survey.IsPassedTheTest
             };
             
             AddUserToMemory(chatId, user);
-            
             return user;
         }
 
