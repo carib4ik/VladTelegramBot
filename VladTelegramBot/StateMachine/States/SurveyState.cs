@@ -32,7 +32,7 @@ public class SurveyState(
                 userData.SurveyStep++;
                 break;
             case 3:
-                userData.Answer3 = callbackQuery?.Data;
+                userData.Answer3 = callbackQuery != null ? callbackQuery.Data : userAnswer;
                 await botClient.SendMessage(chatId, GlobalData.Question4);
                 userData.SurveyStep++;
                 break;
@@ -65,8 +65,10 @@ public class SurveyState(
         var answerButton4 = InlineKeyboardButton.WithCallbackData("Команда", "Команда");
         var answerButton5 = InlineKeyboardButton.WithCallbackData("Автоматизация б-п", "Автоматизация б-п");
 
-        var keyboard = new InlineKeyboardMarkup([[answerButton1, answerButton2], [answerButton3, answerButton4], [answerButton5]]);
+        var keyboard = new InlineKeyboardMarkup([
+            [answerButton1, answerButton2], [answerButton3, answerButton4], [answerButton5]
+        ]);
 
         return keyboard;
-    } 
+    }
 }

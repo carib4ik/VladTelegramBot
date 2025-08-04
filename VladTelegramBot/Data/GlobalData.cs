@@ -12,7 +12,7 @@ public static class GlobalData
     
     public const string Question1 = "Какой у тебя сейчас бизнес (или ниша) / должность (если найм)?";
     public const string Question2 = "Личный доход в месяц (в $)?";
-    public const string Question3 = "На чём сейчас твой фокус?\n— открыть бизнес\n— масштабирование\n— увеличить прибыль\n— команд образование \n— автоматизация б-п\n— другое (свой ответ) ";
+    public const string Question3 = "На чём сейчас твой фокус? Можно написать свой вариант";
     public const string Question4 = "Почему ты здесь? Что хочешь узнать?";
     public const string Question5 = "Какие у тебя планы или цель на ближайшие 5 лет?";
 }
