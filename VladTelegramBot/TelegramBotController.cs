@@ -35,13 +35,12 @@ public class TelegramBotController(
 
         var commands = new[]
         {
-            new BotCommand { Command = GlobalData.Start, Description = "Запустить бота" }
+            new BotCommand { Command = GlobalData.Start, Description = "Запустить бот" }
         };
         
         await botClient.SetMyCommands(
             commands,
-            scope: new BotCommandScopeDefault(),
-            languageCode: "ru"
+            scope: new BotCommandScopeDefault()
         );
     }
     
@@ -58,7 +57,7 @@ public class TelegramBotController(
         return Task.CompletedTask;
     }
     
-    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, 
+    private async Task HandleUpdateAsync(ITelegramBotClient telegramBotClient, Update update, 
         CancellationToken cancellationToken)
     {
         Console.WriteLine($"Update received: {update.Type}");
@@ -81,7 +80,7 @@ public class TelegramBotController(
         var chatId = message != null ? message.Chat.Id : callbackQuery.Message.Chat.Id;
         var telegramName = message != null ? message.From.Username : callbackQuery.From.Username;
 
-        await botClient.SendChatAction(chatId, ChatAction.Typing, cancellationToken: cancellationToken);
+        await telegramBotClient.SendChatAction(chatId, ChatAction.Typing, cancellationToken: cancellationToken);
         await usersDataProvider.GetOrCreateUserDataAsync(chatId, telegramName);
 
         if (messageText == GlobalData.Start || messageText == GlobalData.Answer)
