@@ -420,3 +420,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+/VladTelegramBot/AppConfigs/appsettings.json
+/docker-compose.yml
