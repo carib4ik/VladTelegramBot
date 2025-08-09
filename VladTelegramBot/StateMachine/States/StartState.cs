@@ -39,7 +39,7 @@ public class StartState(
         }
         else
         {
-            var answerButton = InlineKeyboardButton.WithCallbackData("Пройти опрос", GlobalData.Answer);
+            var answerButton = InlineKeyboardButton.WithCallbackData("Начать опрос", GlobalData.Answer);
 
             var keyboard = new InlineKeyboardMarkup([[answerButton]]);
 
