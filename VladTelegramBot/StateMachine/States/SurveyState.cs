@@ -63,7 +63,7 @@ public class SurveyState(
         var answerButton2 = InlineKeyboardButton.WithCallbackData("Масштабирование", "Масштабирование");
         var answerButton3 = InlineKeyboardButton.WithCallbackData("Увеличить прибыль", "Увеличить прибыль");
         var answerButton4 = InlineKeyboardButton.WithCallbackData("Команда", "Команда");
-        var answerButton5 = InlineKeyboardButton.WithCallbackData("Автоматизация б-п", "Автоматизация б-п");
+        var answerButton5 = InlineKeyboardButton.WithCallbackData("Автоматизация бизнес процессов", "Автоматизация бизнес процессов");
 
         var keyboard = new InlineKeyboardMarkup([
             [answerButton1, answerButton2], [answerButton3, answerButton4], [answerButton5]
